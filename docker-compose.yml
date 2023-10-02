@@ -14,7 +14,9 @@ services:
       - default
     depends_on:
       - postgres
-    volumes: [] # See docker-compose.ssl.yml and docker-compose.no_ssl.yml
+    volumes:
+      - ./api/certs:/app/certs:ro
+      - ./api/api_keys.json:/app/api_keys.json:ro
 
   postgres:
     image: postgres:16-bookworm

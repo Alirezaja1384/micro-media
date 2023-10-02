@@ -4,5 +4,3 @@ services:
   api:
     ports:
       - 8002:80
-    volumes:
-      - ./api/api_keys.json:/app/api_keys.json:ro
