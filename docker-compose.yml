@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  api:
+    restart: always
+    image: ${DOCKER_REGISTRY-}micro-media:latest
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file:
+      - ./api/prod.env
+    ports: [] # See docker-compose.ssl.yml and docker-compose.no_ssl.yml
+    networks:
+      - default
+    depends_on:
+      - postgres
+    volumes: [] # See docker-compose.ssl.yml and docker-compose.no_ssl.yml
+
+  postgres:
+    image: postgres:16-bookworm
+    restart: always
+    networks:
+      - default
+    env_file:
+      - ./postgres/prod.env
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro # Init script
+      - /var/lib/postgresql/micro-media:/var/lib/postgresql/data # Data
+
+networks:
+  default:
+    driver: bridge

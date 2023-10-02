@@ -1,0 +1,9 @@
+[
+    {
+        "sha256": "THE_API_KEY_HASH",
+        "scopes": [
+            "media:read",
+            "media:validate"
+        ]
+    }
+]

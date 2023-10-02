@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  api:
+    environment:
+      - GUNICORN_CERT_FILE=/app/certs/cert.pem
+      - GUNICORN_KEY_FILE=/app/certs/key.pem
+    ports:
+      - 8002:443
+    volumes:
+      - ./api/certs:/app/certs:ro
+      - ./api/api_keys.json:/app/api_keys.json:ro
