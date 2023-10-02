@@ -6,11 +6,11 @@ DIR=$(dirname $0)
 
 # Delete all containers if running
 echo "> Stopping containers ..."
-docker compose --file "${DIR}/docker-compose.yml" down
+docker compose --project-directory "${DIR}" down
 
 # Build and start containers
 echo "> Building and starting containers ..."
-docker compose --file "${DIR}/docker-compose.yml" up --build -d
+docker compose --project-directory "${DIR}" up --build -d
 
 # Follow logs
 echo "> Gathering API logs ..."
