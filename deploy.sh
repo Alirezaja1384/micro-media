@@ -15,4 +15,4 @@ docker compose --project-directory "${DIR}" up --build -d
 # Follow logs
 echo "> Gathering API logs ..."
 echo "> Press CTRL+C to exit ..."
-sleep 2 && docker compose --file "${DIR}/docker-compose.yml" logs --follow api
+sleep 2 && docker compose --project-directory "${DIR}" logs --follow api
