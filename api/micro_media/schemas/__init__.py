@@ -1,3 +1,7 @@
-from .user import JWTUser, APIKeyUser
+from .user import JWTUser, APIKeyUser, APIKeyPermission
 
-__all__ = ["JWTUser", "APIKeyUser"]
+__all__ = [
+    "JWTUser",
+    "APIKeyUser",
+    "APIKeyPermission",
+]
