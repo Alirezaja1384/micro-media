@@ -143,3 +143,6 @@ certs/
 # Customized docekrfile
 docker-compose.dev.yml
 docker-compose.override.yml
+
+# PEM files
+*.pem

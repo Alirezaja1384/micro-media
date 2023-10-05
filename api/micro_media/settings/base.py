@@ -1,14 +1,14 @@
 from typing import cast
 from decouple import config
 
-from .utils import to_list
+from .utils import to_list, file_or_text
 
 
 DEBUG = cast(bool, config("DEBUG", default=False, cast=bool))
 
 APP_NAME = cast(str, config("APP_NAME", default="MicroMedia"))
 
-JWT_DECODE_KEY = cast(str, config("JWT_DECODE_KEY"))
+JWT_DECODE_KEY = cast(str, config("JWT_DECODE_KEY", cast=file_or_text))
 JWT_DECODE_ALGORITHMS = cast(
     list[str], config("JWT_DECODE_ALGORITHMS", cast=to_list)
 )
@@ -24,6 +24,4 @@ SQLALCHEMY_ECHO = cast(
 )
 SQLALCHEMY_CONN_STR = cast(str, config("SQLALCHEMY_CONN_STR"))
 
-API_KEYS_FILE = cast(
-    str | None, config("API_KEYS_FILE", default="api_keys.json")
-)
+API_KEYS_FILE = cast(str, config("API_KEYS_FILE", default="api_keys.json"))

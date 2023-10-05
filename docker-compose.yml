@@ -17,6 +17,7 @@ services:
     volumes:
       - ./api/certs:/app/certs:ro
       - ./api/api_keys.json:/app/api_keys.json:ro
+      # - ./api/jwt_pub.pem:/app/jwt_pub.pem:ro # JWT's RS256 public key
 
   postgres:
     image: postgres:16-bookworm
