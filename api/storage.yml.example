@@ -1,0 +1,11 @@
+default_storage: bf1414fd-0b49-4e8c-a97a-740640977b91
+storages:
+    - id: bf1414fd-0b49-4e8c-a97a-740640977b91
+      provider: "s3"
+      random_filenames: true
+
+      s3:
+          endpoint_url: https://the-storage.whaterver
+          access_key_id: YOUR_ACCESS_KEY_ID
+          secret_access_key: A_VERY_SECRET_ACCESS_KEY
+          bucket_name: MY_AWESOME_BUCKET

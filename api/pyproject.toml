@@ -18,7 +18,15 @@ python-decouple = "^3.8"
 fastapi-pagination = "^0.12.10"
 fastapi-auth-utils = { git = "https://github.com/Alirezaja1384/fastapi-auth-utils" }
 alembic = "^1.12.0"
+pyyaml = "^6.0.1"
+aioboto3 = "^11.3.0"
+python-multipart = "^0.0.6"
+pyjwt = {extras = ["crypto"], version = "^2.8.0"}
+pillow = "^10.0.1"
 
+
+[tool.poetry.group.dev.dependencies]
+types-aioboto3 = {extras = ["essential"], version = "^11.3.0"}
 
 [build-system]
 requires = ["poetry-core"]

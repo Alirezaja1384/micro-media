@@ -1,1 +1,5 @@
 ## MicroMedia
+
+
+### TODO:
+- [] Image thumbnails.

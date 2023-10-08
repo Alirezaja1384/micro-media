@@ -1,0 +1,32 @@
+image:
+    max_file_size: 10485760 # 10 MB
+
+    allowed_formats:
+        - png
+        - jpg
+        - jpeg
+
+    force_format:
+        pil_format: JPEG
+        file_extension: jpg
+        convert_mode: RGB
+
+    resize:
+        max_width: 1920
+        max_height: 1920
+
+video:
+    max_file_size: 52428800 # 50 MB
+    allowed_formats:
+        - mp4
+        - mkv
+        - mov
+        - webm
+
+document:
+    max_file_size: 20971520 # 20 MB
+    allowed_formats:
+        - pdf
+        - doc
+        - docx
+        - odt

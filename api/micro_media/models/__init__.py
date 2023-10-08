@@ -7,8 +7,10 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
 )
 
-from micro_media.settings.base import SQLALCHEMY_CONN_STR, SQLALCHEMY_ECHO
+from micro_media.settings import SQLALCHEMY_CONN_STR, SQLALCHEMY_ECHO
+
 from .base import Base
+from .media import Media
 
 
 @lru_cache(maxsize=None)
@@ -27,4 +29,5 @@ __all__ = [
     "Base",
     "get_engine",
     "get_session",
+    "Media",
 ]

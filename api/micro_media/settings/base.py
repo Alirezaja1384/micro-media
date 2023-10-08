@@ -25,3 +25,9 @@ SQLALCHEMY_ECHO = cast(
 SQLALCHEMY_CONN_STR = cast(str, config("SQLALCHEMY_CONN_STR"))
 
 API_KEYS_FILE = cast(str, config("API_KEYS_FILE", default="api_keys.json"))
+
+STORAGE_CONFIG_FILE = cast(
+    str, config("STORAGE_CONFIG_FILE", default="storage.yml")
+)
+
+MEDIA_CONFIG_FILE = cast(str, config("MEDIA_CONFIG_FILE", default="media.yml"))

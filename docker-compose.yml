@@ -17,6 +17,8 @@ services:
     volumes:
       - ./api/certs:/app/certs:ro
       - ./api/api_keys.json:/app/api_keys.json:ro
+      - ./api/media.yml:/app/media.yml:ro
+      - ./api/storage.yml:/app/storage.yml:ro
       # - ./api/jwt_pub.pem:/app/jwt_pub.pem:ro # JWT's RS256 public key
 
   postgres:
