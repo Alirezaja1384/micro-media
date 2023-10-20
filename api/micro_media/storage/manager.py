@@ -151,7 +151,7 @@ class S3StorageManager(AbstractStorageManager):
             return key
 
     async def generate_file_link(
-        self, file_identifier: str, expires_in: int = 0, **kwargs
+        self, file_identifier: str, expires_in: int = 3600, **kwargs
     ) -> str:
         """
         Generate a file link for given file_identifier.
@@ -159,8 +159,7 @@ class S3StorageManager(AbstractStorageManager):
         Args:
             file_identifier (str): The object key returned from save_media().
             expires_in (int, optional): The amount of time in seconds which
-                the desired link will bed valid. The link will have no
-                expiration when set to zero. Defaults to 0.
+                the desired link will bed valid. Defaults to 3600.
 
         Returns:
             str: The object's link.
