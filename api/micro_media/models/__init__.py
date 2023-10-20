@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import (
 from micro_media.settings import SQLALCHEMY_CONN_STR, SQLALCHEMY_ECHO
 
 from .base import Base
-from .media import Media
+from .media import Media, MediaType
 
 
 @lru_cache(maxsize=None)
@@ -30,4 +30,5 @@ __all__ = [
     "get_engine",
     "get_session",
     "Media",
+    "MediaType",
 ]

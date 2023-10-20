@@ -32,6 +32,16 @@ services:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro # Init script
       - /var/lib/postgresql/micro-media:/var/lib/postgresql/data # Data
 
+  imgproxy:
+    image: darthsim/imgproxy:v3.2
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - default
+    env_file:
+      - ./imgproxy/prod.env
+
 networks:
   default:
     driver: bridge

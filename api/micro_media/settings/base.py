@@ -31,3 +31,10 @@ STORAGE_CONFIG_FILE = cast(
 )
 
 MEDIA_CONFIG_FILE = cast(str, config("MEDIA_CONFIG_FILE", default="media.yml"))
+
+IMGPROXY_HOST = cast(str, config("IMGPROXY_HOST"))
+IMGPROXY_KEY = cast(str, config("IMGPROXY_KEY"))
+IMGPROXY_SALT = cast(str, config("IMGPROXY_SALT"))
+IMGPROXY_RESIZE_ENLARGE = cast(
+    bool, config("IMGPROXY_RESIZE_ENLARGE", default=True)
+)

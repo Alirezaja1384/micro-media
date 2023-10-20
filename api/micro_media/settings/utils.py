@@ -13,4 +13,4 @@ def file_or_text(inp: str) -> str:
         return file.read()
 
 
-__all__ = ["to_list"]
+__all__ = ["to_list", "file_or_text"]

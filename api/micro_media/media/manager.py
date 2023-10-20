@@ -4,7 +4,11 @@ from typing import Callable, Generic, TypeVar
 from PIL import Image
 
 from .exceptions import InvalidFileExtensionError, FileTooLargeError
-from .config import BaseMediaTypeConfig, ImageMediaConfig
+from .config import (
+    BaseMediaTypeConfig,
+    ImageMediaConfig,
+    ImageMediaThumbnailSizeConfig,
+)
 from .utils import change_file_extension, get_file_extension
 
 
@@ -164,3 +168,46 @@ class ImageMediaManager(BaseMediaManager[ImageMediaConfig]):
             img.save(result, format=img_format)
 
         return filename, result
+
+    def get_thumbnail_sizes(self) -> list[str]:
+        """Returns list of available thumbnail sizes.
+
+        Returns:
+            list[str]: Available thumbnail sizes.
+        """
+        if self.config.thumbnails:
+            return list(self.config.thumbnails.sizes.keys())
+
+        return []
+
+    def get_thumbnail_size_conf(
+        self, size_name: str | None
+    ) -> ImageMediaThumbnailSizeConfig | None:
+        """
+        Finds the thumbnail size config for the given size name.
+
+        Args:
+            size_name (str | None): Thumbnail size name or None.
+                Use None to get the default thumbnail size config.
+
+        Returns:
+            ImageMediaThumbnailSizeConfig | None: The thumbnail size config.
+        """
+        thumbnails_conf = self.config.thumbnails
+
+        try:
+            if not thumbnails_conf or not (
+                size_name or thumbnails_conf.default_size
+            ):
+                return None
+
+            if not size_name:
+                size_name = thumbnails_conf.default_size
+
+            return next(
+                thumb_conf
+                for thumb_size, thumb_conf in thumbnails_conf.sizes.items()
+                if thumb_size == size_name
+            )
+        except StopIteration:
+            return None
