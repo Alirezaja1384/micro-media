@@ -2,4 +2,5 @@
 
 
 ### TODO:
-- [] Image thumbnails.
+- [x] Image thumbnails.
+- [ ] Media validation endpoints.
