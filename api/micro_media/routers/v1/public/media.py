@@ -68,7 +68,7 @@ async def get_thumbnail(
             IMAGE_MEDIA_MANAGER.get_thumbnail_size_conf(
                 size_name=None if size == "default" else size
             ),
-            message="Invalid thumbnail.",
+            message="Invalid thumbnail size.",
         ),
     )
 
