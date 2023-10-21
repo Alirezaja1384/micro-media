@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ./api/prod.env
-    ports: [] # See docker-compose.ssl.yml and docker-compose.no_ssl.yml
+    ports: [] # See docker-compose.override.yml.example
     networks:
       - default
     depends_on:
@@ -35,8 +35,7 @@ services:
   imgproxy:
     image: darthsim/imgproxy:v3.2
     restart: always
-    ports:
-      - 8080:8080
+    ports: [] # See docker-compose.override.yml.example
     networks:
       - default
     env_file:
