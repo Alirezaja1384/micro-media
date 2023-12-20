@@ -32,6 +32,7 @@ async def save_media(
         media_type=data.media_type,
         filename=filename,
         file=file,
+        content_type=data.file.content_type,
     )
 
     media = Media(

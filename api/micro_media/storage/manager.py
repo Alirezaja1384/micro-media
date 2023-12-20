@@ -119,6 +119,7 @@ class S3StorageManager(AbstractStorageManager):
         owner_id: UUID,
         filename: str,
         file: BytesIO,
+        content_type: str | None = None,
         **kwargs,
     ) -> str:
         """
@@ -142,10 +143,15 @@ class S3StorageManager(AbstractStorageManager):
                 media_type=media_type, owner_id=owner_id, filename=filename
             )
 
+            additional_args = {}
+            if content_type:
+                additional_args["ContentType"] = content_type
+
             await s3_client.put_object(
                 Key=key,
                 Body=file.getvalue(),
                 Bucket=self.storage_conf.bucket_name,
+                **additional_args,
             )
 
             return key
