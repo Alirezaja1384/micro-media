@@ -1,5 +1,9 @@
+from uuid import UUID
 from io import BytesIO
 from typing import Annotated
+
+import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncSession
 from auth_utils import get_user
 from fastapi import APIRouter, Depends
 from micro_media.models import get_session, Media
@@ -7,7 +11,7 @@ from micro_media.models import get_session, Media
 from micro_media.schemas import JWTUser, v1 as schemas
 from micro_media.media import MEDIA_CONTEXT as MC
 from micro_media.storage import STORAGE_CONTEXT as SC
-from sqlalchemy.ext.asyncio import AsyncSession
+from micro_media.utils.sqlalchemy import get_one
 
 
 router = APIRouter()
@@ -46,3 +50,23 @@ async def save_media(
     await session.commit()
 
     return media
+
+
+@router.delete("/{media_id}", status_code=204)
+async def delete_media(
+    media_id: UUID,
+    user: Annotated[JWTUser, Depends(get_user)],
+    session: Annotated[AsyncSession, Depends(get_session)],
+):
+    storage_manager = SC.default_manager
+    media = await get_one(
+        session=session,
+        query=sa.select(Media).where(
+            Media.owner_id == user.identity, Media.id == media_id
+        ),
+    )
+
+    await storage_manager.delete_file(media.file_identifier)
+
+    await session.delete(media)
+    await session.commit()

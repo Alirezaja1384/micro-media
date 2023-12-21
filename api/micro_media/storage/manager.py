@@ -48,6 +48,18 @@ class AbstractStorageManager(metaclass=ABCMeta):
         """
 
     @abstractmethod
+    async def delete_file(
+        self,
+        file_identifier: str,
+        **kwargs,
+    ) -> None:
+        """Deletes the given file from storage.
+
+        Args:
+            file_identifier (str): The file's identifier.
+        """
+
+    @abstractmethod
     async def generate_file_link(self, file_identifier: str, **kwargs) -> str:
         """Generates a link for given file identifier.
 
@@ -155,6 +167,18 @@ class S3StorageManager(AbstractStorageManager):
             )
 
             return key
+
+    async def delete_file(self, file_identifier: str, **kwargs) -> None:
+        """Deletes the given file from storage.
+
+        Args:
+            file_identifier (str): The file's identifier.
+        """
+
+        async with self.client as s3_client:
+            await s3_client.delete_object(
+                Key=file_identifier, Bucket=self.storage_conf.bucket_name
+            )
 
     async def generate_file_link(
         self, file_identifier: str, expires_in: int = 3600, **kwargs
