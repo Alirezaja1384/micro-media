@@ -62,7 +62,9 @@ async def delete_media(
     media = await get_one(
         session=session,
         query=sa.select(Media).where(
-            Media.owner_id == user.identity, Media.id == media_id
+            Media.owner_id == user.identity,
+            Media.id == media_id,
+            sa.not_(Media.ack),
         ),
     )
 
