@@ -25,6 +25,8 @@ class Media(Base):
         index=True,
     )
 
+    ack = sa.Column(sa.Boolean, nullable=False, default=False, index=True)
+
     owner_id = sa.Column(sa.UUID, nullable=False, index=True)
     storage_id = sa.Column(sa.UUID, nullable=False, index=True)
     file_identifier = sa.Column(sa.String, nullable=False, index=True)
