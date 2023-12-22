@@ -24,7 +24,9 @@ class MediaCreate(MediaBase):
     def as_form(
         cls,
         file: Annotated[UploadFile, File()],
-        media_type: Annotated[MediaType, Form()],
+        media_type: Annotated[
+            MediaType, Form(alias="mediaType", validation_alias="mediaType")
+        ],
         title: Annotated[str | None, Form()] = None,
         description: Annotated[str | None, Form()] = None,
     ) -> "MediaCreate":
