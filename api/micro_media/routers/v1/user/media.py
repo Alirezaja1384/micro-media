@@ -20,7 +20,7 @@ router = APIRouter()
 @router.post("/upload", response_model=schemas.MediaRead)
 async def save_media(
     user: Annotated[JWTUser, Depends(get_user)],
-    data: Annotated[schemas.MediaCreate, Depends()],
+    data: Annotated[schemas.MediaCreate, Depends(schemas.MediaCreate.as_form)],
     session: Annotated[AsyncSession, Depends(get_session)],
 ):
     storage_manager = SC.default_manager
@@ -30,6 +30,7 @@ async def save_media(
         filename=data.file.filename or "",
         file=BytesIO(await data.file.read()),
     )
+    await data.file.close()
 
     file_identifier = await storage_manager.save_media(
         owner_id=user.identity,
@@ -38,6 +39,8 @@ async def save_media(
         file=file,
         content_type=data.file.content_type,
     )
+
+    file.close()
 
     media = Media(
         **data.model_dump(exclude={"file"}),
