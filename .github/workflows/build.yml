@@ -6,12 +6,12 @@ on:
             - "v*.*.*"
 
 jobs:
-    meta:
+    build-push:
         runs-on: ubuntu-latest
 
-        outputs:
-            tags: ${{ steps.meta.outputs.tags }}
-            labels: ${{ steps.meta.outputs.labels }}
+        permissions:
+            contents: read
+            packages: write
 
         steps:
             - name: Checkout
@@ -34,13 +34,6 @@ jobs:
                       type=semver,pattern={{version}}
                       type=sha
 
-    docker-prepare:
-        runs-on: ubuntu-latest
-        permissions:
-            contents: read
-            packages: write
-
-        steps:
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v3
 
@@ -61,19 +54,10 @@ jobs:
                   username: ${{ github.repository_owner }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
-    build-push:
-        runs-on: ubuntu-latest
-        needs: [meta, docker-prepare]
-
-        permissions:
-            contents: read
-            packages: write
-
-        steps:
             - name: Build and push
               uses: docker/build-push-action@v5
               with:
                   push: true
                   context: "{{defaultContext}}:api"
-                  tags: ${{ needs.meta.outputs.tags }}
-                  labels: ${{ needs.meta.outputs.labels }}
+                  tags: ${{ steps.meta.outputs.tags }}
+                  labels: ${{ steps.meta.outputs.labels }}
