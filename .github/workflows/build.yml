@@ -8,6 +8,11 @@ on:
 jobs:
     meta:
         runs-on: ubuntu-latest
+
+        outputs:
+            tags: ${{ steps.meta.outputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}
+
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -70,5 +75,5 @@ jobs:
               with:
                   push: true
                   context: "{{defaultContext}}:api"
-                  tags: ${{ steps.meta.outputs.tags }}
-                  labels: ${{ steps.meta.outputs.labels }}
+                  tags: ${{ needs.meta.outputs.tags }}
+                  labels: ${{ needs.meta.outputs.labels }}
