@@ -30,6 +30,8 @@ RUN poetry install --no-root --no-ansi --only main
 ##### Production image #####
 FROM python:3.11-slim as production
 
+LABEL org.opencontainers.image.source = "https://github.com/Alirezaja1384/micro-media" 
+
 # Set workdir
 WORKDIR /app
 
