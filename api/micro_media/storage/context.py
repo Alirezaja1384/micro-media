@@ -1,5 +1,6 @@
 from uuid import UUID
 from typing import Self
+from functools import cached_property
 
 import yaml
 
@@ -14,6 +15,16 @@ class StorageContext:
 
     def __init__(self, config: StoragesConfig) -> None:
         self.config = config
+
+    @cached_property
+    def storages(self) -> dict[UUID, Storage]:
+        """
+        Returns a dictionary of storages with their ids as keys.
+
+        Returns:
+            dict[UUID, Storage]: The storages dictionary.
+        """
+        return {storage.id: storage for storage in self.config.storages}
 
     @classmethod
     def from_yaml_file(cls, config_path: str) -> Self:
@@ -62,12 +73,8 @@ class StorageContext:
             Storage: The storage object.
         """
         try:
-            return next(
-                storage
-                for storage in self.config.storages
-                if storage.id == storage_id
-            )
-        except StopIteration as exc:
+            return self.storages[storage_id]
+        except KeyError as exc:
             raise StorageNotFoundError(
                 f"Storage {storage_id} not found."
             ) from exc
