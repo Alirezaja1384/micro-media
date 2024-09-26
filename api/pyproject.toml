@@ -27,6 +27,7 @@ fastapi-auth-utils = "^1.1.2"
 
 [tool.poetry.group.dev.dependencies]
 types-aioboto3 = { extras = ["essential"], version = "^11.3.0" }
+aiodebug = "^2.3.0"
 
 [build-system]
 requires = ["poetry-core"]

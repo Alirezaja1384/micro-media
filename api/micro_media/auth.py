@@ -10,25 +10,20 @@ logger = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=None)
-def get_api_key_users() -> list[APIKeyUser]:
+def get_api_key_users() -> dict[str, APIKeyUser]:
     if not API_KEYS_FILE:
-        return []
+        return {}
 
     with open(API_KEYS_FILE, "r", encoding="utf-8") as keys_file:
-        return [APIKeyUser(**key_dict) for key_dict in json.load(keys_file)]
+        return {
+            key_dict["sha256"]: APIKeyUser(**key_dict)
+            for key_dict in json.load(keys_file)
+        }
 
 
 async def get_api_key_user(api_key: str) -> APIKeyUser | None:
     api_key_hash = hashlib.sha256(api_key.encode("utf-8")).hexdigest()
-
-    try:
-        return next(
-            key_user
-            for key_user in get_api_key_users()
-            if key_user.sha256 == api_key_hash
-        )
-    except StopIteration:
-        return None
+    return get_api_key_users().get(api_key_hash)
 
 
 def validate_api_keys() -> None:

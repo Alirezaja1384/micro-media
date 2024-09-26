@@ -16,10 +16,20 @@ from micro_media.media.manager import ImageMediaManager
 
 router = APIRouter()
 
-
+THUMBNAIL_MANAGER = IMGProxyThumbnailManager()
 IMAGE_MEDIA_MANAGER: ImageMediaManager = cast(
     ImageMediaManager, MC.get_manager("image")
 )
+
+
+async def _get_original_link(media: Media, expires_in: int):
+    storage_manager = SC.get_manager(storage_id=media.storage_id)
+
+    file_link = await storage_manager.generate_file_link(
+        file_identifier=media.file_identifier, expires_in=expires_in
+    )
+
+    return file_link
 
 
 @router.get("/original/{media_id}", status_code=302)
@@ -30,14 +40,10 @@ async def get_original_file(
         session=session, query=sa.select(Media).filter(Media.id == media_id)
     )
 
-    storage_manager = SC.get_manager(storage_id=media.storage_id)
-
-    file_link = await storage_manager.generate_file_link(
-        file_identifier=media.file_identifier, expires_in=3600
-    )
-
     return RedirectResponse(
-        url=file_link, status_code=302, headers={"max-age": "3600"}
+        url=await _get_original_link(media=media, expires_in=3600),
+        status_code=302,
+        headers={"max-age": "3600"},
     )
 
 
@@ -49,6 +55,13 @@ async def get_thumbnail(
         "default", *IMAGE_MEDIA_MANAGER.get_thumbnail_sizes()
     ] = "default",
 ):
+    size_conf = truthy_or_404(
+        IMAGE_MEDIA_MANAGER.get_thumbnail_size_conf(
+            size_name=None if size == "default" else size
+        ),
+        message="Invalid thumbnail size.",
+    )
+
     media = await get_one(
         session=session,
         query=sa.select(Media).filter(
@@ -56,20 +69,11 @@ async def get_thumbnail(
         ),
     )
 
-    original_file_link = await SC.get_manager(
-        storage_id=media.storage_id
-    ).generate_file_link(
-        file_identifier=media.file_identifier, expires_in=3600
-    )
-
-    thumbnail_link = IMGProxyThumbnailManager().get_thumbnail_link(
-        original_file_link=original_file_link,
-        thumbnail_size=truthy_or_404(
-            IMAGE_MEDIA_MANAGER.get_thumbnail_size_conf(
-                size_name=None if size == "default" else size
-            ),
-            message="Invalid thumbnail size.",
+    thumbnail_link = THUMBNAIL_MANAGER.get_thumbnail_link(
+        original_file_link=await _get_original_link(
+            media=media, expires_in=3600
         ),
+        thumbnail_size=size_conf,
     )
 
     return RedirectResponse(

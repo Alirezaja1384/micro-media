@@ -1,6 +1,6 @@
 from uuid import UUID
 from typing import Self
-from functools import cached_property
+from functools import cached_property, lru_cache
 
 import yaml
 
@@ -79,6 +79,7 @@ class StorageContext:
                 f"Storage {storage_id} not found."
             ) from exc
 
+    @lru_cache(maxsize=10)
     def get_manager(self, storage_id: UUID) -> AbstractStorageManager:
         """Creates a storage manager for given storage id.
 
