@@ -31,6 +31,11 @@ class Media(Base):
     storage_id = sa.Column(sa.UUID, nullable=False, index=True)
     file_identifier = sa.Column(sa.String, nullable=False, index=True)
 
+    created_at = sa.Column(
+        sa.DateTime, nullable=False, server_default=sa.func.now()
+    )
+    ack_at = sa.Column(sa.DateTime, nullable=True)
+
     __table_args__ = (
         sa.UniqueConstraint(
             "storage_id", "file_identifier", name="unique_identifier"

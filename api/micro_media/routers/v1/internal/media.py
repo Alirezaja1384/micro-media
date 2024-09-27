@@ -59,7 +59,9 @@ async def bulk_ack(
         return []
 
     await session.execute(
-        sa.Update(Media).where(Media.id.in_(ids)).values(ack=True)
+        sa.Update(Media)
+        .where(Media.id.in_(ids))
+        .values(ack=True, ack_at=sa.func.now())
     )
     await session.commit()
 
