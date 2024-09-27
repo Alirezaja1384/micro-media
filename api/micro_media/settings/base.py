@@ -38,3 +38,6 @@ IMGPROXY_SALT = cast(str, config("IMGPROXY_SALT"))
 IMGPROXY_RESIZE_ENLARGE = cast(
     bool, config("IMGPROXY_RESIZE_ENLARGE", default=True)
 )
+
+REDIS_URL = cast(str, config("REDIS_URL"))
+REDIS_PREFIX = cast(str, config("REDIS_PREFIX", default="micro_media:"))

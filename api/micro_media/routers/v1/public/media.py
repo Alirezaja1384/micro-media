@@ -8,6 +8,7 @@ from starlette.responses import RedirectResponse
 
 from micro_media.utils import truthy_or_404
 from micro_media.utils.sqlalchemy import get_one
+from micro_media.utils.cache import AsyncRedisCache
 from micro_media.models import get_session, Media, MediaType
 from micro_media.storage import STORAGE_CONTEXT as SC
 from micro_media.media import MEDIA_CONTEXT as MC, IMGProxyThumbnailManager
@@ -22,7 +23,13 @@ IMAGE_MEDIA_MANAGER: ImageMediaManager = cast(
 )
 
 
-async def _get_original_link(media: Media, expires_in: int):
+@AsyncRedisCache.aredis_cache(
+    key_generator=lambda media, expires_in: f"original_link:{media.id}",
+    cache_deserializer=str,
+    cache_serializer=str,
+    ttl=60,
+)
+async def _get_original_link(media: Media, expires_in: int) -> str:
     storage_manager = SC.get_manager(storage_id=media.storage_id)
 
     file_link = await storage_manager.generate_file_link(
