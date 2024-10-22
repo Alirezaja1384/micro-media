@@ -1,4 +1,4 @@
-from typing import Literal, Self, Type
+from typing import Literal, Self, Type, overload
 
 import yaml
 
@@ -45,6 +45,21 @@ class MediaContext:
             return cls(
                 config=MediaConfig.model_validate(yaml.safe_load(config_file))
             )
+
+    @overload
+    def get_manager(
+        self, media_type: Literal["image"]
+    ) -> ImageMediaManager: ...
+
+    @overload
+    def get_manager(
+        self, media_type: Literal["video"]
+    ) -> BaseMediaManager: ...
+
+    @overload
+    def get_manager(
+        self, media_type: Literal["document"]
+    ) -> BaseMediaManager: ...
 
     def get_manager(self, media_type: MediaType) -> BaseMediaManager:
         """

@@ -1,8 +1,13 @@
 from enum import Enum
-from typing import Annotated
+from typing import Annotated, Literal
+
 from uuid import UUID
+from pydantic import Field, computed_field, create_model
 from fastapi import File, Form, UploadFile
+
+from micro_media.media.manager import ImageMediaManager
 from micro_media.utils import APIModel
+from micro_media.media import MEDIA_CONTEXT as MC
 
 
 class MediaType(str, Enum):
@@ -38,5 +43,29 @@ class MediaCreate(MediaBase):
         )
 
 
+THUMBNAIL_SIZES = MC.get_manager("image").get_thumbnail_sizes()
+
+ThumbnailSizesModel = create_model(
+    "ThumbnailSizesModel",
+    **{size: (str, Field(...)) for size in THUMBNAIL_SIZES},
+)
+
+
 class MediaRead(MediaBase):
     id: UUID
+
+    @computed_field
+    def original_path(self) -> str:
+        return f"/v1/public/media/original/{self.id}"
+
+    @computed_field
+    def thumbnail_paths(self) -> ThumbnailSizesModel | None:
+        if self.media_type != MediaType.IMAGE:
+            return None
+
+        return ThumbnailSizesModel.model_validate(
+            {
+                size: f"/v1/public/media/thumbnail/{self.id}?size={size}"
+                for size in THUMBNAIL_SIZES
+            }
+        )
