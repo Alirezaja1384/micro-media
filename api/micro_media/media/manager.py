@@ -1,4 +1,6 @@
+import asyncio
 from io import BytesIO
+from concurrent.futures import ThreadPoolExecutor
 from typing import Callable, Generic, TypeVar
 
 from PIL import Image
@@ -15,6 +17,9 @@ from .utils import change_file_extension, get_file_extension
 T = TypeVar("T", bound=BaseMediaTypeConfig)
 
 
+thread_pool = ThreadPoolExecutor()
+
+
 class BaseMediaManager(Generic[T]):
     media_type: str
     config: T
@@ -24,7 +29,7 @@ class BaseMediaManager(Generic[T]):
         self.config = config
 
     def validate_media(
-        self, filename: str, file: BytesIO
+        self, filename: str, data: bytes
     ) -> tuple[str, BytesIO]:
         """Validates the filename and file.
 
@@ -35,11 +40,30 @@ class BaseMediaManager(Generic[T]):
         Returns:
             tuple[str, BytesIO]: Validated filename and file.
         """
+        file = BytesIO(data)
+
         # Run UploadFile validators one by one
         for validator in self.get_validators():
             filename, file = validator(filename, file)
+            file.seek(0)
 
         return filename, file
+
+    async def avalidate_media(
+        self, filename: str, data: bytes
+    ) -> tuple[str, BytesIO]:
+        """Validates the filename and file asynchronously.
+
+        Args:
+            filename (str): The file's filename.
+            file (BinaryIO): The file's content.
+
+        Returns:
+            tuple[str, BytesIO]: Validated filename and file.
+        """
+        return await asyncio.get_event_loop().run_in_executor(
+            thread_pool, self.validate_media, filename, data
+        )
 
     def get_validators(
         self,
@@ -146,7 +170,6 @@ class ImageMediaManager(BaseMediaManager[ImageMediaConfig]):
             tuple[str, BytesIO]: Validated filename and file content.
         """
         result = BytesIO()
-
         with Image.open(file) as img:
             img_format = img.format
 

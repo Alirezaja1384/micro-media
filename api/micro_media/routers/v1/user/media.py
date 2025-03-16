@@ -1,5 +1,4 @@
 from uuid import UUID
-from io import BytesIO
 from typing import Annotated
 
 import sqlalchemy as sa
@@ -26,11 +25,12 @@ async def save_media(
     storage_manager = SC.default_manager
     media_manager = MC.get_manager(data.media_type.value)
 
-    filename, file = media_manager.validate_media(
-        filename=data.file.filename or "",
-        file=BytesIO(await data.file.read()),
-    )
+    file_data = await data.file.read()
     await data.file.close()
+    filename, file = await media_manager.avalidate_media(
+        filename=data.file.filename or "",
+        data=file_data,
+    )
 
     file_identifier = await storage_manager.save_media(
         owner_id=user.identity,
