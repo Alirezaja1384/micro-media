@@ -11,7 +11,6 @@ python = "^3.11"
 fastapi = "^0.110.0"
 pydantic = "^2.4.2"
 sqlalchemy = { extras = ["asyncio"], version = "^2.0.21" }
-asyncpg = "^0.28.0"
 uvicorn = "^0.23.2"
 gunicorn = "^22.0.0"
 python-decouple = "^3.8"
@@ -25,6 +24,7 @@ pillow = "^10.2.0"
 fastapi-auth-utils = "^1.1.2"
 cachetools = "^5.5.0"
 redis = "^5.0.8"
+asyncpg = "^0.30.0"
 
 
 [tool.poetry.group.dev.dependencies]
