@@ -13,15 +13,24 @@ from .base import Base
 from .media import Media, MediaType
 
 
-@lru_cache(maxsize=None)
-def get_engine():
-    return create_async_engine(SQLALCHEMY_CONN_STR, echo=SQLALCHEMY_ECHO)
+# create the engine only once
+_engine = create_async_engine(
+    SQLALCHEMY_CONN_STR,
+    echo=SQLALCHEMY_ECHO,
+    pool_size=10,
+    max_overflow=10,
+    pool_pre_ping=True,
+)
+
+# create the sessionmaker only once
+AsyncSessionLocal = async_sessionmaker(
+    bind=_engine,
+    expire_on_commit=False,
+)
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    async_session = async_sessionmaker(get_engine(), expire_on_commit=False)
-
-    async with async_session() as session:
+    async with AsyncSessionLocal() as session:
         yield session
 
 
