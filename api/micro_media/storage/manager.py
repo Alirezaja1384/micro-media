@@ -1,6 +1,9 @@
 from abc import ABCMeta, abstractmethod
+import asyncio
+from contextlib import asynccontextmanager
+from functools import cached_property
 from io import BytesIO
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, AsyncGenerator
 from uuid import UUID, uuid4
 
 import aioboto3
@@ -74,6 +77,7 @@ class AbstractStorageManager(metaclass=ABCMeta):
 class S3StorageManager(AbstractStorageManager):
     storage: Storage
     session: aioboto3.Session
+    _client: "S3Client | None"
 
     def __init__(self, storage: Storage) -> None:
         super().__init__(storage)
@@ -81,16 +85,23 @@ class S3StorageManager(AbstractStorageManager):
             aws_access_key_id=self.storage_conf.access_key_id,
             aws_secret_access_key=self.storage_conf.secret_access_key,
         )
+        self._client = None
+        self.client_lock = asyncio.Lock()
 
-    @property
+    @cached_property
     def storage_conf(self) -> S3Config:
         return self.storage.s3
 
-    @property
-    def client(self) -> "S3Client":
-        return self.session.client(
-            "s3", endpoint_url=self.storage_conf.endpoint_url
-        )
+    @asynccontextmanager
+    async def client(self) -> AsyncGenerator["S3Client", None]:
+        async with self.client_lock:
+            if not self._client:
+                client = self.session.client(
+                    "s3", endpoint_url=self.storage_conf.endpoint_url
+                )
+                self._client = await client.__aenter__()
+
+        yield self._client
 
     def _generate_object_key(
         self, media_type: str, owner_id: UUID, filename: str
@@ -150,23 +161,23 @@ class S3StorageManager(AbstractStorageManager):
         Returns:
             str: The object key as file identifier.
         """
-        async with self.client as s3_client:
-            key = self._generate_object_key(
-                media_type=media_type, owner_id=owner_id, filename=filename
-            )
+        key = self._generate_object_key(
+            media_type=media_type, owner_id=owner_id, filename=filename
+        )
 
-            additional_args = {}
-            if content_type:
-                additional_args["ContentType"] = content_type
+        additional_args = {}
+        if content_type:
+            additional_args["ContentType"] = content_type
 
-            await s3_client.put_object(
+        async with self.client() as client:
+            await client.put_object(
                 Key=key,
                 Body=file.getvalue(),
                 Bucket=self.storage_conf.bucket_name,
                 **additional_args,
             )
 
-            return key
+        return key
 
     async def delete_file(self, file_identifier: str, **kwargs) -> None:
         """Deletes the given file from storage.
@@ -174,9 +185,8 @@ class S3StorageManager(AbstractStorageManager):
         Args:
             file_identifier (str): The file's identifier.
         """
-
-        async with self.client as s3_client:
-            await s3_client.delete_object(
+        async with self.client() as client:
+            await client.delete_object(
                 Key=file_identifier, Bucket=self.storage_conf.bucket_name
             )
 
@@ -194,8 +204,8 @@ class S3StorageManager(AbstractStorageManager):
         Returns:
             str: The object's link.
         """
-        async with self.client as s3_client:
-            return await s3_client.generate_presigned_url(
+        async with self.client() as client:
+            return await client.generate_presigned_url(
                 "get_object",
                 ExpiresIn=expires_in,
                 Params={

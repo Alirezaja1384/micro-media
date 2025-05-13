@@ -79,7 +79,7 @@ class StorageContext:
                 f"Storage {storage_id} not found."
             ) from exc
 
-    @lru_cache(maxsize=10)
+    @lru_cache(maxsize=None)
     def get_manager(self, storage_id: UUID) -> AbstractStorageManager:
         """Creates a storage manager for given storage id.
 

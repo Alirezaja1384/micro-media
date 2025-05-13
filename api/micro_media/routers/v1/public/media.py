@@ -22,12 +22,14 @@ IMAGE_MEDIA_MANAGER: ImageMediaManager = cast(
     ImageMediaManager, MC.get_manager("image")
 )
 
+CACHE_TTL = 60 * 60  # 1 hour
+
 
 @AsyncRedisCache.aredis_cache(
     key_generator=lambda media, expires_in: f"original_link:{media.id}",
     cache_deserializer=str,
     cache_serializer=str,
-    ttl=60,
+    ttl=max(CACHE_TTL - 30, 30),
 )
 async def _get_original_link(media: Media, expires_in: int) -> str:
     storage_manager = SC.get_manager(storage_id=media.storage_id)
@@ -50,7 +52,7 @@ async def get_original_file(
     return RedirectResponse(
         url=await _get_original_link(media=media, expires_in=3600),
         status_code=302,
-        headers={"max-age": "3600"},
+        headers={"max-age": f"{CACHE_TTL}"},
     )
 
 
